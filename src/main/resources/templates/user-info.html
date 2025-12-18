@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Профиль ${user.name!"пользователя"} — Label App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px auto;
+            max-width: 1000px;
+            background: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        h1 {
+            margin-bottom: 10px;
+            color: #222;
+            font-size: 28px;
+            text-align: center;
+        }
+        h3 {
+            margin: 20px 0 30px;
+            color: #444;
+            text-align: center;
+            font-weight: normal;
+            font-size: 22px;
+        }
+        hr {
+            border: none;
+            border-top: 2px solid #eee;
+            margin: 40px 0;
+        }
+        .user-info {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 18px;
+        }
+        .user-info p {
+            margin: 12px 0;
+        }
+        .tracks-section {
+            margin-top: 20px;
+        }
+        .tracks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        .track-card {
+            background: #f1f3f5;
+            border-radius: 12px;
+            padding: 18px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .track-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+        }
+        .track-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .track-artists {
+            color: #555;
+            margin-bottom: 12px;
+        }
+        .track-link {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .track-link:hover {
+            text-decoration: underline;
+        }
+        .no-tracks {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+            font-size: 20px;
+        }
+        .error-message {
+            text-align: center;
+            color: #dc3545;
+            font-size: 20px;
+            margin: 40px 0;
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 40px;
+            padding: 14px 28px;
+            background: #6c757d;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 18px;
+            max-width: 300px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .back-link:hover {
+            background: #545b62;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <h1>Label App</h1>
+    <h3>Профиль пользователя <strong>${user.name!"Без имени"}</strong></h3>
+
+    <div class="user-info">
+        <p><strong>Email:</strong> ${user.email}</p>
+        <p><strong>Никнейм:</strong> ${user.name!"Не указан"}</p>
+    </div>
+
+    <hr>
+
+    <h3>Треки пользователя</h3>
+
+    <div class="tracks-section">
+        <#if tracks?? && tracks?has_content>
+        <div class="tracks-grid">
+            <#list tracks as track>
+            <div class="track-card">
+                <div class="track-title">
+                    <a href="/track/${track.id}" class="track-link">
+                        ${track.title!"(без названия)"}
+                    </a>
+                </div>
+                <div class="track-artists">
+                    <strong>${track.artists!"Неизвестный артист"}</strong>
+                </div>
+                <a href="/track/${track.id}" class="track-link">Подробнее →</a>
+            </div>
+        </#list>
+    </div>
+    <#else>
+    <#if errorMessage??>
+    <div class="error-message">${errorMessage}</div>
+    <#else>
+    <div class="no-tracks">
+        <p>У пользователя пока нет загруженных треков.</p>
+    </div>
+</#if>
+</#if>
+</div>
+
+<a href="/" class="back-link">← Назад в каталог</a>
+
+</div>
+
+</body>
+</html>

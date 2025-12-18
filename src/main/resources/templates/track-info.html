@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>${track.title!"Трек"} — Label App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px auto;
+            max-width: 900px;
+            background: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        h1 { margin-bottom: 10px; color: #222; }
+        hr { border: none; border-top: 2px solid #eee; margin: 30px 0; }
+        .cover-img {
+            max-width: 100%; max-height: 600px; border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: block; margin: 20px auto;
+        }
+        .no-cover {
+            height: 400px; background: #e9ecef; border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            color: #6c757d; font-size: 24px; margin: 20px auto;
+        }
+        audio { width: 100%; margin: 40px 0; }
+        .info-box {
+            background: white; padding: 30px; border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); font-size: 18px;
+        }
+        .warning {
+            background: #fff3cd; padding: 15px; border-radius: 8px;
+            color: #856404; border: 1px solid #ffeaa7; margin: 20px 0;
+        }
+        .favorite-btn {
+            background: ${isFavorite?then('#ffc107', '#28a745')};
+            color: white; padding: 14px 28px; border: none;
+            border-radius: 8px; cursor: pointer; font-size: 18px; margin: 10px 0;
+        }
+        .favorite-btn:hover { opacity: 0.9; }
+        .delete-btn {
+            background: #dc3545; color: white; padding: 12px 24px; border: none;
+            border-radius: 8px; cursor: pointer; font-size: 16px;
+        }
+        .delete-btn:hover { background: #c82333; }
+        .comment-form { margin-top: 40px; }
+        .comment-form textarea {
+            width: 100%; height: 120px; padding: 15px; font-size: 16px;
+            border: 1px solid #ccc; border-radius: 8px; resize: vertical;
+        }
+        .comment-btn {
+            margin-top: 10px; padding: 12px 28px; background: #007bff;
+            color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px;
+        }
+        .comment-btn:hover { background: #0056b3; }
+        .comments-section { margin-top: 50px; }
+        .comment {
+            background: #f8f9fa; padding: 20px; border-radius: 12px;
+            margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .comment-author {
+            font-weight: bold; font-size: 17px; margin-bottom: 8px;
+        }
+        .comment-author a { color: #007bff; text-decoration: none; }
+        .comment-author a:hover { text-decoration: underline; }
+        .comment-date {
+            color: #777; font-size: 14px; margin-bottom: 12px;
+        }
+        .comment-text {
+            white-space: pre-wrap; /* сохраняет переносы строк и пробелы */
+            margin: 0;
+        }
+        .back-link {
+            display: inline-block; margin-top: 40px; padding: 12px 24px;
+            background: #6c757d; color: white; text-decoration: none; border-radius: 8px;
+            font-size: 16px;
+        }
+        .back-link:hover { background: #545b62; }
+        .favorites-link {
+            display: inline-block; margin-top: 40px; margin-left: 20px;
+            padding: 12px 24px; background: #ffc107; color: #212529;
+            text-decoration: none; border-radius: 8px; font-size: 16px;
+        }
+        .favorites-link:hover { background: #e0a800; }
+    </style>
+</head>
+<body>
+
+<h1>${track.title!"Без названия"}</h1>
+<hr>
+
+<#if track.previewCoverId??>
+<img src="/covers/${track.previewCoverId}" alt="Обложка трека" class="cover-img">
+<#else>
+<div class="no-cover">Нет обложки</div>
+</#if>
+
+<h2>🎵 Прослушать трек</h2>
+<#if track.audioFilePath??>
+<audio controls preload="metadata">
+    <source src="${track.audioFilePath}" type="${track.musicContentType!"audio/mpeg"}">
+    Ваш браузер не поддерживает воспроизведение аудио.
+</audio>
+<#else>
+<div class="warning">
+    ⚠️ Аудиофайл отсутствует или повреждён.
+</div>
+</#if>
+
+<div class="info-box">
+    <p><strong>Исполнители:</strong> ${track.artists!"Неизвестно"}</p>
+    <p><strong>Жанр:</strong> ${track.genre!"Не указан"}</p>
+    <p><strong>Дата релиза:</strong> ${track.releaseDate!"Не указана"}</p>
+    <p><strong>Загружен:</strong> ${track.artistName!"Аноним"}</p>
+
+    <#if track.lyric?? && track.lyric?trim != "">
+    <h3>Текст песни</h3>
+    <pre style="white-space: pre-wrap; background:#f1f3f5; padding:20px; border-radius:8px;">${track.lyric?html}</pre>
+</#if>
+</div>
+
+<#-- Кнопка избранного (только для залогиненных) -->
+<#if user??>
+<hr>
+<form action="/track/${track.id}/favorite" method="post" style="display:inline;">
+    <input type="hidden" name="_csrf" value="${_csrf.token}">
+    <button type="submit" class="favorite-btn">
+        <#if isFavorite>⭐ Удалить из избранного<#else>❤ Добавить в избранное</#if>
+    </button>
+</form>
+</#if>
+
+<#-- Комментарии -->
+<div class="comments-section">
+    <h2>Комментарии <#if track.comments??>(${track.comments?size})</#if></h2>
+    <hr>
+
+    <#if track.comments?? && (track.comments?size > 0)>
+    <#list track.comments as comment>
+    <div class="comment">
+        <div class="comment-author">
+            <#if comment.authorId??>
+            <a href="/user/${comment.authorId}">${comment.authorName!"Аноним"}</a>
+            <#else>
+            ${comment.authorName!"Аноним"}
+        </#if>
+    </div>
+    <p class="comment-text">${comment.text?html?replace("\n", "<br>")}</p>
+</div>
+</#list>
+<#else>
+<p>Комментариев пока нет. Станьте первым!</p>
+</#if>
+
+<#-- Форма добавления комментария -->
+<#if user??>
+<div class="comment-form">
+    <form action="/track/${track.id}/comment" method="post">
+        <textarea name="text" placeholder="Напишите ваш комментарий..." required></textarea>
+        <input type="hidden" name="_csrf" value="${_csrf.token}">
+        <button type="submit" class="comment-btn">Отправить комментарий</button>
+    </form>
+</div>
+<#else>
+<p><a href="/login">Войдите</a>, чтобы оставить комментарий.</p>
+</#if>
+</div>
+
+<#-- Удаление трека (админ или владелец) -->
+<#if user?? && (user.isAdmin() || isOwner)>
+<hr>
+<form action="/track/delete/${track.id}" method="post"
+      onsubmit="return confirm('Удалить трек «${track.title!"без названия"}» навсегда? Это действие необратимо!');">
+<input type="hidden" name="_csrf" value="${_csrf.token}">
+<button type="submit" class="delete-btn">🗑️ Удалить трек</button>
+</form>
+</#if>
+
+<hr>
+
+<a href="/" class="back-link">← Вернуться в каталог</a>
+<#if user??>
+<a href="/favorites" class="favorites-link">Моё избранное ❤️</a>
+</#if>
+
+</body>
+</html>

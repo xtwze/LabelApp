@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Label App — Каталог треков</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f8f9fa; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .track-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; margin-top: 30px; }
+        .track-card {
+            background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .track-card:hover { transform: translateY(-8px); box-shadow: 0 12px 24px rgba(0,0,0,0.15); }
+        .track-cover {
+            width: 100%; height: 250px; object-fit: cover;
+        }
+        .track-info { padding: 15px; }
+        .track-title { margin: 0; font-size: 18px; }
+        .track-artists { margin: 5px 0 10px; color: #555; font-weight: bold; }
+        .track-user { color: #777; font-size: 14px; }
+        .search-box { width: 500px; padding: 12px; font-size: 16px; border-radius: 6px; border: 1px solid #ccc; }
+        button, input[type=submit] { padding: 12px 24px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #0056b3; }
+        a { color: #007bff; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .nav-links a { margin-right: 15px; font-size: 16px; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <h1>Label App</h1>
+    <hr>
+
+    <#-- Авторизация и навигация -->
+    <#if user??>
+    <p>
+        Привет, <strong>${user.name!"Без имени"}</strong>!
+        <span class="nav-links">
+            <a href="/favorites">❤️ Избранное</a>
+            <#if user.isAdmin()>
+            | <a href="/admin">Админка</a>
+            </#if>
+        </span>
+    <form action="/logout" method="post" style="display:inline; margin-left: 20px;">
+        <input type="hidden" name="_csrf" value="${_csrf.token}">
+        <button type="submit" style="padding:8px 16px;font-size:14px;">Выйти</button>
+    </form>
+    </p>
+    <#else>
+    <p>
+        <a href="/login">Войти</a> | <a href="/registration">Регистрация</a>
+    </p>
+</#if>
+
+<hr>
+
+<#-- Поиск -->
+<form action="/" method="get" style="margin-bottom: 20px;">
+    <input type="text" name="title" value="${title!''}" placeholder="Поиск по названию трека..." class="search-box">
+    <button type="submit">Найти</button>
+</form>
+
+<#-- Добавление трека -->
+<#if user??>
+<p><a href="/track/add"><button>➕ Добавить новый трек</button></a></p>
+</#if>
+
+<hr>
+
+<h2>Каталог треков</h2>
+
+<#if tracks?? && tracks?has_content>
+<div class="track-grid">
+    <#list tracks as track>
+    <div class="track-card">
+        <#if track.previewCoverId??>
+        <a href="/track/${track.id}">
+            <img src="/covers/${track.previewCoverId}" alt="Обложка" class="track-cover">
+        </a>
+        <#else>
+        <div style="height:250px; background:#e9ecef; display:flex; align-items:center; justify-content:center; color:#6c757d;">
+            Нет обложки
+        </div>
+    </#if>
+    <div class="track-info">
+        <h3 class="track-title"><a href="/track/${track.id}">${track.title!"(без названия)"}</a></h3>
+        <p class="track-artists">${track.artists!"Неизвестный артист"}</p>
+        <p class="track-user">Загружен: ${track.artistName!"Аноним"}</p>
+    </div>
+</div>
+</#list>
+</div>
+<#else>
+<p>Треки не найдены. <#if title??>Попробуйте изменить запрос поиска.</#if></p>
+</#if>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Добавить трек — Label App</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; max-width: 800px; }
+        label { display: block; margin: 15px 0 5px; font-weight: bold; }
+        input[type=text], input[type=file] { width: 100%; padding: 10px; font-size: 16px; }
+        textarea { width: 100%; height: 150px; padding: 10px; font-size: 16px; }
+        button { padding: 12px 24px; background: #28a745; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; }
+        button:hover { background: #218838; }
+        .back { margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+<h1>Добавить новый трек</h1>
+<hr>
+
+<form action="/track/create" method="post" enctype="multipart/form-data">
+    <label>Название трека *</label>
+    <input type="text" name="title" required>
+
+    <label>Исполнители *</label>
+    <input type="text" name="artists" required>
+
+    <label>Жанр</label>
+    <input type="text" name="genre">
+
+    <label>Дата релиза (например: 2025)</label>
+    <input type="text" name="releaseDate" placeholder="2025">
+
+    <label>Текст песни</label>
+    <textarea name="lyric"></textarea>
+
+    <label>Обложка (изображение)</label>
+    <input type="file" name="cover" accept="image/*">
+
+    <label>Аудиофайл *</label>
+    <input type="file" name="audio" accept="audio/*" required>
+
+    <input type="hidden" name="_csrf" value="${_csrf.token}">
+
+    <br><br>
+    <button type="submit">Добавить трек</button>
+</form>
+
+<div class="back">
+    <a href="/">← Вернуться к каталогу</a>
+</div>
+
+</body>
+</html>

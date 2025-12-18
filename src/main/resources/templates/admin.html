@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Админка — Label App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px auto;
+            max-width: 1200px;
+            background: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #222;
+            margin-bottom: 10px;
+        }
+        hr {
+            border: none;
+            border-top: 2px solid #eee;
+            margin: 30px 0;
+        }
+        .users-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(900px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .user-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .user-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+        }
+        .user-info {
+            flex: 1;
+        }
+        .user-info strong {
+            display: block;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+        .user-status {
+            margin: 5px 0;
+            font-size: 15px;
+        }
+        .user-roles {
+            color: #555;
+            font-size: 14px;
+        }
+        .user-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            min-width: 100px;
+        }
+        .btn-ban {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-ban:hover {
+            background: #c82333;
+        }
+        .btn-unban {
+            background: #28a745;
+            color: white;
+        }
+        .btn-unban:hover {
+            background: #218838;
+        }
+        .btn-edit {
+            background: #007bff;
+            color: white;
+        }
+        .btn-edit:hover {
+            background: #0056b3;
+        }
+        .btn-info {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-info:hover {
+            background: #545b62;
+        }
+        .no-users {
+            text-align: center;
+            padding: 60px;
+            color: #6c757d;
+            font-size: 20px;
+        }
+        .back-link {
+            margin-top: 40px;
+            display: inline-block;
+            padding: 12px 24px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 18px;
+        }
+        .back-link:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <h1>Label App — Панель администратора</h1>
+    <hr>
+
+    <#if users?? && users?has_content>
+    <div class="users-grid">
+        <#list users as u> <#-- переименовал user в u, чтобы не конфликтовать с глобальным user -->
+        <div class="user-card">
+            <div class="user-info">
+                <strong>${u.email}</strong>
+                <div class="user-status">
+                    Статус:
+                    <strong>${u.active?string("Активен", "Заблокирован")}</strong>
+                </div>
+                <div class="user-roles">
+                    Роли:
+                    <#list u.roles as role>
+                    ${role}<#sep>,
+                </#list>
+            </div>
+        </div>
+
+        <div class="user-actions">
+            <form action="/admin/user/ban/${u.id}" method="post" style="display:inline;">
+                <input type="hidden" name="_csrf" value="${_csrf.token}">
+                <#if u.active>
+                <button type="submit" class="btn btn-ban">Заблокировать</button>
+                <#else>
+                <button type="submit" class="btn btn-unban">Разблокировать</button>
+            </#if>
+            </form>
+
+            <a href="/admin/user/edit/${u.id}" class="btn btn-edit">Изменить роль</a>
+
+            <a href="/user/${u.id}" class="btn btn-info">Подробности</a>
+        </div>
+    </div>
+</#list>
+</div>
+<#else>
+<div class="no-users">
+    <h3>Пользователей пока нет</h3>
+</div>
+</#if>
+
+<a href="/" class="back-link">← Назад в каталог</a>
+
+</div>
+</body>
+</html>

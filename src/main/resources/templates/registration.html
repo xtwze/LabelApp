@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Регистрация — Label App</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px auto; max-width: 500px; }
+        input[type=text], input[type=email], input[type=password] { width: 100%; padding: 10px; margin: 10px 0; font-size: 16px; }
+        button { padding: 12px; width: 100%; background: #007bff; color: white; border: none; font-size: 16px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<h1>Регистрация</h1>
+<hr>
+
+<form action="/registration" method="post">
+    <label>Имя (отображается в профиле)</label>
+    <input type="text" name="name" required>
+
+    <label>Email (для входа)</label>
+    <input type="email" name="email" required>
+
+    <label>Пароль (минимум 6 символов)</label>
+    <input type="password" name="password" required minlength="6">
+
+    <input type="hidden" name="_csrf" value="${_csrf.token}">
+    <br><br>
+    <button type="submit">Зарегистрироваться</button>
+</form>
+
+<#if errorMessage??>
+    <p style="color: red; margin-top: 20px;">${errorMessage}</p>
+</#if>
+
+<p>Уже есть аккаунт? <a href="/login">Войти</a></p>
+
+</body>
+</html>
