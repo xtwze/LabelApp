@@ -1,5 +1,5 @@
 package com.example.LabelApp.services;
-
+import org.springframework.cache.annotation.Cacheable;
 import com.example.LabelApp.dto.AddTrackDto;
 import com.example.LabelApp.dto.CommentDto;
 import com.example.LabelApp.dto.ShowTrackDto;
@@ -41,9 +41,16 @@ public class TrackService {
     /**
      * Список превью треков для главной страницы
      */
-    @Transactional(readOnly = true)
+    @Cacheable(
+            value = "trackPreviews",
+            key = "#title != null && #title.trim().length() > 0 ? #title.trim() : 'all_tracks'",
+            condition = "#title == null || #title.trim().length() <= 100"   // пример: не кэшируем очень длинные запросы
+    )
+    @Transactional(readOnly = true)   // почти всегда полезно для методов чтения
     public List<TrackPreviewDto> listTrackPreviews(String title) {
-        List<Track> tracks = title != null && !title.isBlank()
+        log.debug("Загружаем список треков для title = {}", title);
+
+        List<Track> tracks = (title != null && !title.isBlank())
                 ? trackRepository.findByTitleContainingIgnoreCase(title.trim())
                 : trackRepository.findAll();
 
